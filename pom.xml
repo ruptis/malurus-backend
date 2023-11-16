@@ -96,6 +96,14 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib.version}</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:21.0.1_12-jre-alpine</image>
+                    </from>
+                    <to>
+                        <image>docker.io/kazyshi/malurus-${project.artifactId}:${project.version}</image>
+                    </to>
+                </configuration>
             </plugin>
         </plugins>
     </build>
