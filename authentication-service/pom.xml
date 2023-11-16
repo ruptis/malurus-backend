@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>authentication-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>authentication-service</name>
     <description>authentication-service</description>
 

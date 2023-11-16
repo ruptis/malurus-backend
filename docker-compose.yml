@@ -9,7 +9,8 @@ services:
     environment:
       POSTGRES_DB: authentication-service
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_AUTH_METHOD: TRUST
       PGDATA: /data/postgres
     volumes:
       - data-authentication-service:/data/postgres
@@ -17,7 +18,7 @@ services:
   authentication-service:
     container_name: authentication-service
     hostname: authentication-service
-    image: kazyshi/malurus-authentication-service:0.0.1-SNAPSHOT
+    image: kazyshi/malurus-authentication-service:0.0.3-SNAPSHOT
     pull_policy: missing
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -42,7 +43,7 @@ services:
   user-service:
     container_name: user-service
     hostname: user-service
-    image: kazyshi/malurus-user-service:0.0.1-SNAPSHOT
+    image: kazyshi/malurus-user-service:0.0.3-SNAPSHOT
     restart: unless-stopped
     pull_policy: missing
     environment:
@@ -55,7 +56,7 @@ services:
   api-gateway:
     container_name: api-gateway
     hostname: api-gateway
-    image: kazyshi/malurus-api-gateway:0.0.1-SNAPSHOT
+    image: kazyshi/malurus-api-gateway:0.0.3-SNAPSHOT
     restart: unless-stopped
     pull_policy: missing
     ports:
@@ -67,7 +68,7 @@ services:
 
   discovery-server:
     container_name: discovery-server
-    image: kazyshi/malurus-discovery-server:0.0.1-SNAPSHOT
+    image: kazyshi/malurus-discovery-server:0.0.3-SNAPSHOT
     hostname: discovery-server
     restart: unless-stopped
     pull_policy: missing
@@ -82,7 +83,7 @@ services:
   config-server:
     container_name: config-server
     hostname: config-server
-    image: kazyshi/malurus-spring-cloud-config-server:0.0.2-SNAPSHOT
+    image: kazyshi/malurus-spring-cloud-config-server:0.0.3-SNAPSHOT
     restart: unless-stopped
     pull_policy: missing
     ports:
