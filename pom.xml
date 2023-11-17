@@ -27,6 +27,7 @@
         <module>social-graph-service</module>
         <module>post-service</module>
         <module>timeline-service</module>
+        <module>fanout-service</module>
     </modules>
 
     <properties>

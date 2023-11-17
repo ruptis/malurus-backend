@@ -59,7 +59,7 @@ services:
     image: postgres:alpine3.17
     restart: unless-stopped
     ports:
-      - 5433:5433
+      - 5433:5432
     environment:
       POSTGRES_DB: social-graph-service
       POSTGRES_USER: postgres
