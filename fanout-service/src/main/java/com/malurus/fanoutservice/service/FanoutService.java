@@ -1,9 +1,8 @@
 package com.malurus.fanoutservice.service;
 
-import com.malurus.fanoutservice.client.UserServiceClient;
+import com.malurus.fanoutservice.client.SocialGraphServiceClient;
 import com.malurus.fanoutservice.constants.Operation;
 import com.malurus.fanoutservice.dto.message.EntityMessage;
-import com.malurus.fanoutservice.dto.response.ProfileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,33 +24,35 @@ public class FanoutService {
         private final String prefix;
     }
 
-    private final UserServiceClient userServiceClient;
+    private final SocialGraphServiceClient socialGraphServiceClient;
     private final CacheService cacheService;
 
     public void processMessageForUserTimeline(EntityMessage entityMessage) {
         final Long entityId = entityMessage.entityId();
-        final String timelineKey = TimelineCachePrefix.USER_TIMELINE_PREFIX.getPrefix().formatted(entityMessage.entityName()) + entityMessage.profileId();
+        final String timelineKey = TimelineCachePrefix.USER_TIMELINE_PREFIX.getPrefix().formatted(entityMessage.entityName()) + entityMessage.userId();
 
         final Operation operation = Operation.valueOf(entityMessage.operation());
-        switch (operation) {
-            case ADD -> addEntityToTimeline(entityId, timelineKey);
-            case DELETE -> deleteEntityFromTimeline(entityId, timelineKey);
+        if (operation == Operation.ADD) {
+            addEntityToTimeline(entityId, timelineKey);
+        } else if (operation == Operation.DELETE) {
+            deleteEntityFromTimeline(entityId, timelineKey);
         }
     }
 
     public void processMessageForHomeTimeline(EntityMessage entityMessage) {
         final Long entityId = entityMessage.entityId();
-        List<ProfileResponse> followers = userServiceClient.getFollowers(entityMessage.profileId());
+        List<String> followers = socialGraphServiceClient.getFollowers(entityMessage.userId());
         String prefix = TimelineCachePrefix.HOME_TIMELINE_PREFIX.getPrefix().formatted(entityMessage.entityName());
 
         final Operation operation = Operation.valueOf(entityMessage.operation());
         if (followers.size() < 10000) {
-            for (ProfileResponse follower : followers) {
-                final String timelineKey = prefix + follower.getProfileId();
+            for (String followerId : followers) {
+                final String timelineKey = prefix + followerId;
 
-                switch (operation) {
-                    case ADD -> addEntityToTimeline(entityId, timelineKey);
-                    case DELETE -> deleteEntityFromTimeline(entityId, timelineKey);
+                if (operation == Operation.ADD) {
+                    addEntityToTimeline(entityId, timelineKey);
+                } else if (operation == Operation.DELETE) {
+                    deleteEntityFromTimeline(entityId, timelineKey);
                 }
             }
         }

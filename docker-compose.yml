@@ -114,6 +114,19 @@ services:
       - redis
       - kafka
 
+  fanout-service:
+    container_name: fanout-service
+    hostname: fanout-service
+    image: kazyshi/malurus-fanout-service:0.0.2-SNAPSHOT
+    restart: unless-stopped
+    pull_policy: missing
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - api-gateway
+      - kafka
+      - redis
+
   api-gateway:
     container_name: api-gateway
     hostname: api-gateway

@@ -28,18 +28,18 @@ public class SocialGraphController {
         return ResponseEntity.ok(socialGraphService.unfollow(followeeId, loggedInUser));
     }
 
-    @GetMapping("/{profileId}/followers")
-    public ResponseEntity<List<String>> getFollowers(@PathVariable String profileId) {
-        return ResponseEntity.ok(socialGraphService.getFollowers(profileId));
+    @GetMapping("/{userId}/followers")
+    public ResponseEntity<List<String>> getFollowers(@PathVariable String userId) {
+        return ResponseEntity.ok(socialGraphService.getFollowers(userId));
     }
 
-    @GetMapping("/{profileId}/followees")
-    public ResponseEntity<List<String>> getFollowees(@PathVariable String profileId) {
-        return ResponseEntity.ok(socialGraphService.getFollowees(profileId));
+    @GetMapping("/{userId}/followees")
+    public ResponseEntity<List<String>> getFollowees(@PathVariable String userId) {
+        return ResponseEntity.ok(socialGraphService.getFollowees(userId));
     }
 
-    @GetMapping("/{profileId}/followees-celebrities")
-    public ResponseEntity<List<String>> getFolloweesCelebrities(@PathVariable String profileId) {
-        return ResponseEntity.ok(socialGraphService.getFolloweesCelebrities(profileId));
+    @GetMapping("/{userId}/followees-celebrities")
+    public ResponseEntity<List<String>> getFolloweesCelebrities(@PathVariable String userId) {
+        return ResponseEntity.ok(socialGraphService.getFolloweesCelebrities(userId));
     }
 }

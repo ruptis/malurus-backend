@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record EntityMessage (
         Long entityId,
-        String profileId,
+        String userId,
         String entityName,
         String operation
 ) {
