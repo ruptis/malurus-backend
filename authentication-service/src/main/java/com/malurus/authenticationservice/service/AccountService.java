@@ -24,9 +24,17 @@ public class AccountService {
                 ));
     }
 
-    public Account createAccount(String email, String password) {
+    public Account findAccountById(String id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        messageService.generateMessage("error.entity.not_found", id)
+                ));
+    }
+
+    public Account createAccount(String id, String email, String password) {
         return accountRepository.saveAndFlush(
                 Account.builder()
+                        .id(id)
                         .email(email)
                         .password(passwordEncoder.encode(password))
                         .isAccountNonLocked(true)

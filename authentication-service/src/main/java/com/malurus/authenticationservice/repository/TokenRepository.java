@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-    Optional<Token> findByAccount_Id(Long id);
+    Optional<Token> findByAccount_Id(String id);
 
     Optional<Token> findByJwt(String jwt);
 }

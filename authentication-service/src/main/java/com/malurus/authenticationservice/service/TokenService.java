@@ -5,12 +5,14 @@ import com.malurus.authenticationservice.entity.Token;
 import com.malurus.authenticationservice.exception.InvalidTokenException;
 import com.malurus.authenticationservice.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import static com.malurus.authenticationservice.model.TokenType.BEARER;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -43,6 +45,7 @@ public class TokenService {
                 .orElse(false);
 
         if (isTokenValid && jwtService.isJwtValid(jwt, userDetails)) {
+            log.info(userDetails.getUsername());
             return userDetails.getUsername();
         } else {
             throw new InvalidTokenException("Authentication token is invalid!");
@@ -50,7 +53,7 @@ public class TokenService {
     }
 
     private UserDetails extractUserDetails(String jwt) {
-        String email = jwtService.extractEmail(jwt);
-        return userDetailsService.loadUserByUsername(email);
+        String userId = jwtService.extractId(jwt);
+        return userDetailsService.loadUserByUsername(userId);
     }
 }

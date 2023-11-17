@@ -9,8 +9,6 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
-    private RouteValidator(){}
-
     public static final List<String> openApiEndpoints = List.of(
             "/api/v1/auth/",
             "/swagger-ui/**",
@@ -20,7 +18,7 @@ public class RouteValidator {
             "/api/v1/profile/file/download/"
     );
 
-    public static final Predicate<ServerHttpRequest> isSecured =
+    public Predicate<ServerHttpRequest> isSecured =
             request -> openApiEndpoints.stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));
 }

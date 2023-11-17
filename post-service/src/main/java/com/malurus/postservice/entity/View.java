@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
-        name = "view",
+        name = "views",
         uniqueConstraints = @UniqueConstraint(columnNames = {"parent_post_id", "userId"}),
         indexes = {
                 @Index(columnList = "parent_post_id")

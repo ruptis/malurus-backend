@@ -17,7 +17,6 @@ public interface PostMapper {
     @Mapping(target = "text", expression = "java(request.text())")
     @Mapping(target = "userId", expression = "java(loggedInUser)")
     @Mapping(target = "creationDate", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "mediaUrls", ignore = true)
     @Mapping(target = "likes", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "reposts", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "replies", expression = "java(new java.util.HashSet<>())")
@@ -36,7 +35,6 @@ public interface PostMapper {
     @Mapping(target = "text", ignore = true)
     @Mapping(target = "userId", expression = "java(loggedInUser)")
     @Mapping(target = "creationDate", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "mediaUrls", ignore = true)
     @Mapping(target = "likes", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "reposts", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "replies", expression = "java(new java.util.HashSet<>())")
@@ -49,7 +47,6 @@ public interface PostMapper {
             String loggedInUser
     );
 
-    @Mapping(target = "userId", expression = "java(post.getUserId())")
     @Mapping(target = "quoteTo", expression = "java(this.toResponse(post.getQuoteTo(), loggedInUser, postUtil))")
     @Mapping(target = "replyTo", expression = "java(this.toResponse(post.getReplyTo(), loggedInUser, postUtil))")
     @Mapping(target = "repostTo", expression = "java(this.toResponse(post.getRepostTo(), loggedInUser, postUtil))")
@@ -57,12 +54,12 @@ public interface PostMapper {
     @Mapping(target = "replies", expression = "java(postUtil.countRepliesForPost(post.getId()))")
     @Mapping(target = "views", expression = "java(postUtil.countViewsForPost(post.getId()))")
     @Mapping(target = "reposts", expression = "java(postUtil.countRepostsForPost(post.getId()))")
-    @Mapping(target = "isRePosted", expression = "java(postUtil.isPostRepostedByLoggedInUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isReposted", expression = "java(postUtil.isPostRepostedByLoggedInUser(post.getId(), loggedInUser))")
     @Mapping(target = "isLiked", expression = "java(postUtil.isPostLikedByLoggedInUser(post.getId(), loggedInUser))")
-    @Mapping(target = "isBelongs", expression = "java(postUtil.isPostBelongsToLoggedInUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isBelongs", expression = "java(postUtil.isEntityOwnedByLoggedInUser(post, loggedInUser))")
     PostResponse toResponse(
             Post post,
-            String loggedInUser,
+            @Context String loggedInUser,
             @Context PostUtil postUtil
     );
 

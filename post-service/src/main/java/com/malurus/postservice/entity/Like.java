@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "like",
+        name = "likes",
         uniqueConstraints = @UniqueConstraint(columnNames = {"parent_post_id", "userId"}),
         indexes = {
                 @Index(columnList = "parent_post_id")

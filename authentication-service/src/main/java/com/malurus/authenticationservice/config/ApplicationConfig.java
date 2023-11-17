@@ -38,8 +38,8 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> accountRepository.findByEmail(username)
-                .orElseThrow(() -> new EntityNotFoundException(messageService.generateMessage("error.entity.not_found", username)));
+        return accountId -> accountRepository.findById(accountId)
+                .orElseThrow(() -> new EntityNotFoundException(messageService.generateMessage("error.entity.not_found", accountId)));
     }
 
     @Bean

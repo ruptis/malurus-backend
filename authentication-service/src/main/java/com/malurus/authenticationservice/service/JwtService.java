@@ -36,11 +36,11 @@ public class JwtService {
     }
 
     public boolean isJwtValid(String jwt, UserDetails userDetails) {
-        String username = extractEmail(jwt);
+        String username = extractId(jwt);
         return username.equals(userDetails.getUsername()) && !isJwtExpired(jwt);
     }
 
-    public String extractEmail(String jwt) {
+    public String extractId(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
     }
 

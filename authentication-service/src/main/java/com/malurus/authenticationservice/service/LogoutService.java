@@ -28,12 +28,12 @@ public class LogoutService implements LogoutHandler {
         String jwt = jwtService.extractJwt(request);
 
         if (jwt != null && !jwt.isEmpty()) {
-            String email = jwtService.extractEmail(jwt);
-            Account account = accountService.findAccountByEmail(email);
+            String userId = jwtService.extractId(jwt);
+            Account account = accountService.findAccountById(userId);
 
             tokenService.deleteTokenByAccount(account);
             SecurityContextHolder.clearContext();
-            log.info("user with email {} has logged out", email);
+            log.info("user with id {} has logged out", userId);
         }
     }
 }

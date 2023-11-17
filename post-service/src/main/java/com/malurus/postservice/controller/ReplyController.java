@@ -21,7 +21,7 @@ public class ReplyController {
 
     @PostMapping("/reply/{replyToId}")
     public ResponseEntity<PostResponse> reply(
-            @Valid @RequestPart PostCreateRequest request,
+            @Valid @RequestBody PostCreateRequest request,
             @PathVariable Long replyToId,
             @RequestHeader String loggedInUser
     ) {
@@ -49,7 +49,7 @@ public class ReplyController {
 
     @PatchMapping("/reply/{replyId}")
     public ResponseEntity<PostResponse> updateReply(
-            @Valid @RequestPart PostUpdateRequest request,
+            @Valid @RequestBody PostUpdateRequest request,
             @PathVariable Long replyId,
             @RequestHeader String loggedInUser
     ) {

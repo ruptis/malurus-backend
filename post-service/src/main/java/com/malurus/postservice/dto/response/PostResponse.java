@@ -20,9 +20,9 @@ public class PostResponse {
     private Long id;
     private PostResponse replyTo;
     private PostResponse repostTo;
+    private PostResponse quoteTo;
     private String userId;
     private String text;
-    private PostResponse quoteTo;
     private Integer reposts;
     private Integer replies;
     private Integer likes;

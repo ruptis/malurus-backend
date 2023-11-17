@@ -21,7 +21,7 @@ public class PostController {
 
     @PostMapping("/post")
     public ResponseEntity<PostResponse> createPost(
-            @Valid @RequestPart PostCreateRequest request,
+            @Valid @RequestBody PostCreateRequest request,
             @RequestHeader String loggedInUser
     ) {
         return ResponseEntity.ok(postService.createPost(request, loggedInUser));
@@ -29,7 +29,7 @@ public class PostController {
 
     @PostMapping(value = "/post/{postId}")
     public ResponseEntity<PostResponse> createQuotePost(
-            @Valid @RequestPart PostCreateRequest request,
+            @Valid @RequestBody PostCreateRequest request,
             @PathVariable Long postId,
             @RequestHeader String loggedInUser
     ) {
@@ -52,7 +52,7 @@ public class PostController {
 
     @PatchMapping(value = "/post/{postId}")
     public ResponseEntity<PostResponse> updatePost(
-            @Valid @RequestPart PostUpdateRequest request,
+            @Valid @RequestBody PostUpdateRequest request,
             @PathVariable Long postId,
             @RequestHeader String loggedInUser
     ) {

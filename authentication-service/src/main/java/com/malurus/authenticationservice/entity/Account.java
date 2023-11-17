@@ -17,14 +17,12 @@ import java.util.Collections;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "account")
-public class Account implements UserDetails, BaseEntity<Long> {
+@Table(name = "accounts")
+public class Account implements UserDetails, BaseEntity<String> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    private String userId;
     private String email;
     private String password;
 
@@ -38,7 +36,7 @@ public class Account implements UserDetails, BaseEntity<Long> {
 
     @Override
     public String getUsername() {
-        return userId;
+        return id;
     }
 
     @Override

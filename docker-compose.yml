@@ -83,6 +83,37 @@ services:
       - api-gateway
       - redis
 
+  postgres-post-service:
+    container_name: postgres-post-service
+    hostname: postgres-post-service
+    image: postgres:alpine3.17
+    restart: unless-stopped
+    ports:
+      - 5431:5432
+    environment:
+      POSTGRES_DB: post-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_AUTH_METHOD: TRUST
+      PGDATA: /data/postgres
+    volumes:
+      - data-post-service:/data/postgres
+
+  post-service:
+    container_name: post-service
+    hostname: post-service
+    image: kazyshi/malurus-post-service:0.0.2-SNAPSHOT
+    restart: unless-stopped
+    pull_policy: missing
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-post-service:5432/post-service
+    depends_on:
+      - postgres-post-service
+      - api-gateway
+      - redis
+      - kafka
+
   api-gateway:
     container_name: api-gateway
     hostname: api-gateway
@@ -169,4 +200,5 @@ services:
 volumes:
   data-authentication-service: { }
   data-social-graph-service: { }
+  data-post-service: { }
   mongo: { }

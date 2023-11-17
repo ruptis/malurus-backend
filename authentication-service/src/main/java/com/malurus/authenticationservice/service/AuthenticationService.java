@@ -37,13 +37,11 @@ public class AuthenticationService {
             );
         }
 
-        Account newAccount = accountService.createAccount(request.email(), request.password());
-        log.info("account {} has been created", newAccount.getId());
-
         CreateUserRequest createProfileRequest = new CreateUserRequest(request.username(), request.email(), LocalDate.now());
         String userId = userServiceClient.createUser(createProfileRequest);
-        newAccount.setUserId(userId);
-        log.info("profile {} has been created", userId);
+
+        Account newAccount = accountService.createAccount(userId, request.email(), request.password());
+        log.info("account {} has been created", newAccount.getId());
 
         return RegisterResponse.builder()
                 .message(messageService.generateMessage("register.success"))

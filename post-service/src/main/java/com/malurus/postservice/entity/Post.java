@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "post",
+        name = "posts",
         uniqueConstraints = @UniqueConstraint(columnNames = {"repost_to_id", "userId"}),
         indexes = {
                 @Index(columnList = "reply_to_id", name = "reply_to_id"),
