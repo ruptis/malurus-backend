@@ -27,8 +27,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final MessageSourceService messageSourceService;
 
-    public String createUser(CreateUserRequest createProfileRequest) {
-        return Optional.of(createProfileRequest)
+    public String createUser(CreateUserRequest createUserRequest) {
+        return Optional.of(createUserRequest)
                 .map(userMapper::toEntity)
                 .map(userRepository::save)
                 .map(User::getId)
@@ -47,14 +47,13 @@ public class UserService {
     }
 
     @CachePut(cacheNames = USERS_CACHE, key = "#p0")
-    public UserResponse updateUser(String id, UpdateUserRequest updateProfileRequest, String loggedInUser) {
-        return userRepository.findById(id)
-                .filter(profile -> checkUpdateAvailabilityForUser(profile.getEmail(), loggedInUser))
-                .map(profile -> userMapper.updateProfileFromUpdateProfileRequest(updateProfileRequest, profile))
+    public UserResponse updateUser(UpdateUserRequest updateUserRequest, String loggedInUser) {
+        return userRepository.findById(loggedInUser)
+                .map(user -> userMapper.updateUserFromUpdateUserRequest(updateUserRequest, user))
                 .map(userRepository::save)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        messageSourceService.generateMessage("error.entity.not_found", id)
+                        messageSourceService.generateMessage("error.entity.not_found", loggedInUser)
                 ));
     }
 
@@ -66,22 +65,13 @@ public class UserService {
                 ));
     }
 
-    private boolean checkUpdateAvailabilityForUser(String updatingUser, String loggedInUser) {
-        if (!updatingUser.equals(loggedInUser)) {
-            throw new ActionNotAllowedException(
-                    messageSourceService.generateMessage("error.forbidden")
-            );
-        }
-        return true;
-    }
-
     public Page<UserResponse> findAllByUsername(String username, Pageable pageable) {
         return userRepository.findByUsernameContaining(username, pageable)
                 .map(userMapper::toResponse);
     }
 
     public UserResponse getAuthUser(String loggedInUser) {
-        return userRepository.findByEmail(loggedInUser)
+        return userRepository.findById(loggedInUser)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", loggedInUser)

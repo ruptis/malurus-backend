@@ -24,6 +24,7 @@
         <module>discovery-server</module>
         <module>authentication-service</module>
         <module>user-service</module>
+        <module>social-graph-service</module>
     </modules>
 
     <properties>

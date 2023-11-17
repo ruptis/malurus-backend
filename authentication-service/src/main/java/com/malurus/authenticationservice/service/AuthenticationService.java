@@ -41,8 +41,9 @@ public class AuthenticationService {
         log.info("account {} has been created", newAccount.getId());
 
         CreateUserRequest createProfileRequest = new CreateUserRequest(request.username(), request.email(), LocalDate.now());
-        String profileId = userServiceClient.createUser(createProfileRequest);
-        log.info("profile {} has been created", profileId);
+        String userId = userServiceClient.createUser(createProfileRequest);
+        newAccount.setUserId(userId);
+        log.info("profile {} has been created", userId);
 
         return RegisterResponse.builder()
                 .message(messageService.generateMessage("register.success"))

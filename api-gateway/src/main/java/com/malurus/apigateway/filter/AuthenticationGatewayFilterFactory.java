@@ -26,7 +26,7 @@ public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFac
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = null;
-            if (validator.isSecured.test(exchange.getRequest())) {
+            if (RouteValidator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
                     throw new MissingTokenException("Missing authorization header!");
                 }

@@ -44,13 +44,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/me")
     public ResponseEntity<UserResponse> updateUser(
             @Valid @RequestBody UpdateUserRequest request,
-            @PathVariable String id,
             @RequestHeader String loggedInUser
     ) {
-        return ResponseEntity.ok(userService.updateUser(id, request, loggedInUser));
+        return ResponseEntity.ok(userService.updateUser(request, loggedInUser));
     }
 
     @GetMapping("/id/{email}")

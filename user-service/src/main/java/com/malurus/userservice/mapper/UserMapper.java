@@ -22,5 +22,5 @@ public interface UserMapper {
             @Mapping(target = "email", ignore = true),
             @Mapping(target = "joinDate", ignore = true)
     })
-    User updateProfileFromUpdateProfileRequest(UpdateUserRequest updateProfileRequest, @MappingTarget User profile);
+    User updateUserFromUpdateUserRequest(UpdateUserRequest updateProfileRequest, @MappingTarget User profile);
 }

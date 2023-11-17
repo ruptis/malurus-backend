@@ -53,6 +53,35 @@ services:
       - api-gateway
       - redis
 
+  postgres-social-graph-service:
+    container_name: postgres-social-graph-service
+    hostname: postgres-social-graph-service
+    image: postgres:alpine3.17
+    restart: unless-stopped
+    ports:
+      - 5433:5433
+    environment:
+      POSTGRES_DB: social-graph-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_AUTH_METHOD: TRUST
+      PGDATA: /data/postgres
+    volumes:
+      - data-social-graph-service:/data/postgres
+
+  social-graph-service:
+    container_name: social-graph-service
+    hostname: social-graph-service
+    image: kazyshi/malurus-social-graph-service:0.0.3-SNAPSHOT
+    restart: unless-stopped
+    pull_policy: missing
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-social-graph-service
+      - api-gateway
+      - redis
+
   api-gateway:
     container_name: api-gateway
     hostname: api-gateway
@@ -138,4 +167,5 @@ services:
 
 volumes:
   data-authentication-service: { }
+  data-social-graph-service: { }
   mongo: { }
