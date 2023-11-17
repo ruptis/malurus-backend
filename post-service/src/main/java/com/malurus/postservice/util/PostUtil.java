@@ -1,11 +1,8 @@
 package com.malurus.postservice.util;
 
-import com.malurus.postservice.client.ProfileServiceClient;
 import com.malurus.postservice.constant.EntityName;
 import com.malurus.postservice.constant.Operation;
 import com.malurus.postservice.dto.message.EntityMessage;
-import com.malurus.postservice.dto.response.ProfileResponse;
-import com.malurus.postservice.dto.response.PostResponse;
 import com.malurus.postservice.entity.Post;
 import com.malurus.postservice.exception.ActionNotAllowedException;
 import com.malurus.postservice.repository.LikeRepository;
@@ -38,7 +35,6 @@ public class PostUtil {
     private final LikeRepository likeRepository;
     private final ViewRepository viewRepository;
     private final KafkaProducerService kafkaProducerService;
-    private final ProfileServiceClient profileServiceClient;
     private final MessageSourceService messageSourceService;
     private final CacheManager cacheManager;
 
@@ -59,8 +55,7 @@ public class PostUtil {
     }
 
     public boolean isEntityOwnedByLoggedInUser(Post entity, String loggedInUser) {
-        String profileIdOfLoggedInUser = profileServiceClient.getProfileIdByLoggedInUser(loggedInUser);
-        if (!profileIdOfLoggedInUser.equals(entity.getProfileId())) {
+        if (!loggedInUser.equals(entity.getUserId())) {
             throw new ActionNotAllowedException(
                     messageSourceService.generateMessage("error.action_not_allowed")
             );
@@ -68,18 +63,16 @@ public class PostUtil {
         return true;
     }
 
-    public boolean isPostRepostedByLoggedInUser(Long rePostToId, String loggedInUser, ProfileServiceClient profileServiceClient) {
-        String profileIdOfLoggedInUser = profileServiceClient.getProfileIdByLoggedInUser(loggedInUser);
-        return postRepository.findByRepostToIdAndProfileId(rePostToId, profileIdOfLoggedInUser).isPresent();
+    public boolean isPostRepostedByLoggedInUser(Long repostToId, String loggedInUser) {
+        return postRepository.findByRepostToIdAndUserId(repostToId, loggedInUser).isPresent();
     }
 
-    public boolean isPostLikedByLoggedInUser(Long parentPostId, String loggedInUser, ProfileServiceClient profileServiceClient) {
-        String profileIdOfLoggedInUser = profileServiceClient.getProfileIdByLoggedInUser(loggedInUser);
-        return likeRepository.findByParentPostIdAndProfileId(parentPostId, profileIdOfLoggedInUser).isPresent();
+    public boolean isPostLikedByLoggedInUser(Long parentPostId, String loggedInUser) {
+        return likeRepository.findByParentPostIdAndUserId(parentPostId, loggedInUser).isPresent();
     }
 
     public void sendMessageToKafka(String topic, Post entity, EntityName entityName, Operation operation) {
-        EntityMessage entityMessage = EntityMessage.valueOf(entity.getId(), entity.getProfileId(), entityName, operation);
+        EntityMessage entityMessage = EntityMessage.valueOf(entity.getId(), entity.getUserId(), entityName, operation);
         kafkaProducerService.send(entityMessage, topic);
     }
 
@@ -95,22 +88,6 @@ public class PostUtil {
 
     public void sendMessageWithReply(Post reply, Operation operation) {
         sendMessageToKafka(USER_TIMELINE_TOPIC, reply, REPLIES, operation);
-    }
-
-    public PostResponse updateProfileInResponse(PostResponse response) {
-        if (response.getRepostTo() != null) {
-            response.setRepostTo(updateProfileInResponse(response.getRepostTo()));
-        }
-        if (response.getReplyTo() != null) {
-            response.setReplyTo(updateProfileInResponse(response.getReplyTo()));
-        }
-        if (response.getQuoteTo() != null) {
-            response.setQuoteTo(updateProfileInResponse(response.getQuoteTo()));
-        }
-
-        ProfileResponse profile = profileServiceClient.getProfileById(response.getProfile().getProfileId());
-        response.setProfile(profile);
-        return response;
     }
 
     public void evictEntityFromCache(Long entityId, String cacheName) {

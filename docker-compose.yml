@@ -19,6 +19,7 @@ services:
     container_name: authentication-service
     hostname: authentication-service
     image: kazyshi/malurus-authentication-service:0.0.3-SNAPSHOT
+    restart: unless-stopped
     pull_policy: missing
     environment:
       - SPRING_PROFILES_ACTIVE=docker

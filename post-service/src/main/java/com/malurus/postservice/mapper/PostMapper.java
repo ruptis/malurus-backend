@@ -1,6 +1,5 @@
 package com.malurus.postservice.mapper;
 
-import com.malurus.postservice.client.ProfileServiceClient;
 import com.malurus.postservice.dto.request.PostCreateRequest;
 import com.malurus.postservice.dto.request.PostUpdateRequest;
 import com.malurus.postservice.dto.response.PostResponse;
@@ -16,7 +15,7 @@ public interface PostMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "text", expression = "java(request.text())")
-    @Mapping(target = "profileId", expression = "java(profileServiceClient.getProfileIdByLoggedInUser(loggedInUser))")
+    @Mapping(target = "userId", expression = "java(loggedInUser)")
     @Mapping(target = "creationDate", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "mediaUrls", ignore = true)
     @Mapping(target = "likes", expression = "java(new java.util.HashSet<>())")
@@ -30,13 +29,12 @@ public interface PostMapper {
             PostCreateRequest request,
             Post quoteTo,
             Post replyTo,
-            @Context ProfileServiceClient profileServiceClient,
-            @Context String loggedInUser
+            String loggedInUser
     );
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "text", ignore = true)
-    @Mapping(target = "profileId", expression = "java(profileServiceClient.getProfileIdByLoggedInUser(loggedInUser))")
+    @Mapping(target = "userId", expression = "java(loggedInUser)")
     @Mapping(target = "creationDate", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "mediaUrls", ignore = true)
     @Mapping(target = "likes", expression = "java(new java.util.HashSet<>())")
@@ -48,32 +46,29 @@ public interface PostMapper {
     @Mapping(target = "replyTo", ignore = true)
     Post toEntity(
             Post repostTo,
-            @Context ProfileServiceClient profileServiceClient,
-            @Context String loggedInUser
+            String loggedInUser
     );
 
-    @Mapping(target = "profile", expression = "java(profileServiceClient.getProfileById(Post.getProfileId()))")
-    @Mapping(target = "quoteTo", expression = "java(this.toResponse(Post.getQuoteTo(), loggedInUser, PostUtil, profileServiceClient))")
-    @Mapping(target = "replyTo", expression = "java(this.toResponse(Post.getReplyTo(), loggedInUser, PostUtil, profileServiceClient))")
-    @Mapping(target = "repostTo", expression = "java(this.toResponse(Post.getRePostTo(), loggedInUser, PostUtil, profileServiceClient))")
-    @Mapping(target = "likes", expression = "java(PostUtil.countLikesForPost(Post.getId()))")
-    @Mapping(target = "replies", expression = "java(PostUtil.countRepliesForPost(Post.getId()))")
-    @Mapping(target = "views", expression = "java(PostUtil.countViewsForPost(Post.getId()))")
-    @Mapping(target = "reposts", expression = "java(PostUtil.countRePostsForPost(Post.getId()))")
-    @Mapping(target = "isRePosted", expression = "java(PostUtil.isPostRePostedByLoggedInUser(Post.getId(), loggedInUser, profileServiceClient))")
-    @Mapping(target = "isLiked", expression = "java(PostUtil.isPostLikedByLoggedInUser(Post.getId(), loggedInUser, profileServiceClient))")
-    @Mapping(target = "isBelongs", expression = "java(profileServiceClient.getProfileById(Post.getProfileId()).getEmail().equals(loggedInUser))")
+    @Mapping(target = "userId", expression = "java(post.getUserId())")
+    @Mapping(target = "quoteTo", expression = "java(this.toResponse(post.getQuoteTo(), loggedInUser, postUtil))")
+    @Mapping(target = "replyTo", expression = "java(this.toResponse(post.getReplyTo(), loggedInUser, postUtil))")
+    @Mapping(target = "repostTo", expression = "java(this.toResponse(post.getRepostTo(), loggedInUser, postUtil))")
+    @Mapping(target = "likes", expression = "java(postUtil.countLikesForPost(post.getId()))")
+    @Mapping(target = "replies", expression = "java(postUtil.countRepliesForPost(post.getId()))")
+    @Mapping(target = "views", expression = "java(postUtil.countViewsForPost(post.getId()))")
+    @Mapping(target = "reposts", expression = "java(postUtil.countRepostsForPost(post.getId()))")
+    @Mapping(target = "isRePosted", expression = "java(postUtil.isPostRepostedByLoggedInUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isLiked", expression = "java(postUtil.isPostLikedByLoggedInUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isBelongs", expression = "java(postUtil.isPostBelongsToLoggedInUser(post.getId(), loggedInUser))")
     PostResponse toResponse(
             Post post,
-            @Context String loggedInUser,
-            @Context PostUtil postUtil,
-            @Context ProfileServiceClient profileServiceClient
+            String loggedInUser,
+            @Context PostUtil postUtil
     );
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "profileId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "mediaUrls", ignore = true)
     @Mapping(target = "likes", ignore = true)
     @Mapping(target = "replies", ignore = true)
     @Mapping(target = "reposts", ignore = true)

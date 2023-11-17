@@ -1,7 +1,7 @@
 package com.malurus.postservice.service;
 
-import com.malurus.postservice.dto.message.EntityMessage;
 import com.google.gson.Gson;
+import com.malurus.postservice.dto.message.EntityMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

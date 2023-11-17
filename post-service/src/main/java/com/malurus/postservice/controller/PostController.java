@@ -41,13 +41,13 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(postId, loggedInUser));
     }
 
-    @GetMapping("/posts/user/{profileId}")
+    @GetMapping("/posts/user/{userId}")
     public ResponseEntity<List<PostResponse>> getAllPostsForUser(
-            @PathVariable String profileId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(postService.getAllPostsForUser(profileId, PageRequest.of(page, size)));
+        return ResponseEntity.ok(postService.getAllPostsForUser(userId, PageRequest.of(page, size)));
     }
 
     @PatchMapping(value = "/post/{postId}")

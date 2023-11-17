@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ViewRepository extends JpaRepository<View, Long> {
 
-    Optional<View> findByProfileIdAndParentPostId(String profileId, Long parentPostId);
+    Optional<View> findByUserIdAndParentPostId(String userId, Long parentPostId);
 
     Integer countAllByParentPostId(Long parentPostId);
 }

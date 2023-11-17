@@ -15,8 +15,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "posts",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"repost_to_id", "profileId"}),
+        name = "post",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"repost_to_id", "userId"}),
         indexes = {
                 @Index(columnList = "reply_to_id", name = "reply_to_id"),
                 @Index(columnList = "quote_to_id", name = "quote_to_id"),
@@ -30,10 +30,8 @@ public class Post implements BaseEntity<Long> {
     @EqualsAndHashCode.Include
     private Long id;
     private String text;
-    private String profileId;
+    private String userId;
     private LocalDateTime creationDate;
-    @ElementCollection
-    private Set<String> mediaUrls = new HashSet<>();
 
     @OneToMany(
             targetEntity = Like.class,

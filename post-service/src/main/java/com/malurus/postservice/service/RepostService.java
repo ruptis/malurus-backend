@@ -1,7 +1,5 @@
 package com.malurus.postservice.service;
 
-import com.malurus.postservice.client.ProfileServiceClient;
-import com.malurus.postservice.dto.response.ProfileResponse;
 import com.malurus.postservice.dto.response.PostResponse;
 import com.malurus.postservice.mapper.PostMapper;
 import com.malurus.postservice.repository.PostRepository;
@@ -17,8 +15,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.malurus.postservice.constant.CacheName.REPOSTS_CACHE_NAME;
 import static com.malurus.postservice.constant.CacheName.POSTS_CACHE_NAME;
+import static com.malurus.postservice.constant.CacheName.REPOSTS_CACHE_NAME;
 import static com.malurus.postservice.constant.Operation.ADD;
 import static com.malurus.postservice.constant.Operation.DELETE;
 
@@ -29,19 +27,18 @@ public class RepostService {
     private final PostMapper postMapper;
     private final PostUtil postUtil;
     private final PostRepository postRepository;
-    private final ProfileServiceClient profileServiceClient;
     private final MessageSourceService messageSourceService;
     private final CacheManager cacheManager;
     private final PostService postService;
 
     public boolean repost(Long repostToId, String loggedInUser) {
         postRepository.findById(repostToId)
-                .map(post -> postMapper.toEntity(post, profileServiceClient, loggedInUser))
+                .map(post -> postMapper.toEntity(post, loggedInUser))
                 .map(postRepository::saveAndFlush)
                 .map(repost -> {
                     postUtil.sendMessageWithRepost(repost, ADD);
                     postUtil.evictEntityFromCache(repostToId, POSTS_CACHE_NAME);
-                    return postMapper.toResponse(repost, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(repost, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", repostToId)
@@ -50,8 +47,7 @@ public class RepostService {
     }
 
     public boolean undoRepost(Long repostToId, String loggedInUser) {
-        String profileId = profileServiceClient.getProfileIdByLoggedInUser(loggedInUser);
-        postRepository.findByRepostToIdAndProfileId(repostToId, profileId)
+        postRepository.findByRepostToIdAndUserId(repostToId, loggedInUser)
                 .filter(repost -> postUtil.isEntityOwnedByLoggedInUser(repost, loggedInUser))
                 .ifPresentOrElse(repost -> {
                     postUtil.evictEntityFromCache(repost.getId(), REPOSTS_CACHE_NAME);
@@ -70,11 +66,11 @@ public class RepostService {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(REPOSTS_CACHE_NAME));
         PostResponse repostResponse = cache.get(repostId, PostResponse.class);
         if (repostResponse != null) {
-            return updateRepostResponse(postUtil.updateProfileInResponse(repostResponse));
+            return updateRepostResponse(repostResponse);
         }
         return postRepository.findByIdAndRepostToIsNotNull(repostId)
                 .map(repost -> {
-                    PostResponse response = postMapper.toResponse(repost, loggedInUser, postUtil, profileServiceClient);
+                    PostResponse response = postMapper.toResponse(repost, loggedInUser, postUtil);
                     cache.put(repostId, response);
                     return response;
                 })
@@ -83,18 +79,17 @@ public class RepostService {
                 ));
     }
 
-    public List<PostResponse> getAllRepostsForUser(String profileId, PageRequest page) {
-        ProfileResponse profile = profileServiceClient.getProfileById(profileId);
-        return postRepository.findAllByProfileIdAndRepostToIsNotNullOrderByCreationDateDesc(profileId, page)
+    public List<PostResponse> getAllRepostsForUser(String userId, PageRequest page) {
+        return postRepository.findAllByUserIdAndRepostToIsNotNullOrderByCreationDateDesc(userId, page)
                 .stream()
-                .map(repost -> postMapper.toResponse(repost, profile.getEmail(), postUtil, profileServiceClient))
+                .map(repost -> postMapper.toResponse(repost, userId, postUtil))
                 .collect(Collectors.toList());
     }
 
     private PostResponse updateRepostResponse(PostResponse repostResponse) {
         repostResponse.setRepostTo(postService.getPostById(
                 repostResponse.getRepostTo().getId(),
-                repostResponse.getProfile().getEmail()
+                repostResponse.getUserId()
         ));
         return repostResponse;
     }

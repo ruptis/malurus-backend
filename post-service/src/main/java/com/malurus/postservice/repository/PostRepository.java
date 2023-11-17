@@ -11,23 +11,23 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findAllByProfileIdAndReplyToIsNullAndRepostToIsNullOrderByCreationDateDesc(String profileId, Pageable page);
+    List<Post> findAllByUserIdAndReplyToIsNullAndRepostToIsNullOrderByCreationDateDesc(String userId, Pageable page);
 
-    List<Post> findAllByProfileIdAndReplyToIsNotNullOrderByCreationDateDesc(String profileId, Pageable page);
+    List<Post> findAllByUserIdAndReplyToIsNotNullOrderByCreationDateDesc(String userId, Pageable page);
 
-    List<Post> findAllByProfileIdAndRepostToIsNotNullOrderByCreationDateDesc(String profileId, Pageable page);
+    List<Post> findAllByUserIdAndRepostToIsNotNullOrderByCreationDateDesc(String userId, Pageable page);
 
     List<Post> findAllByReplyToIdOrderByCreationDateDesc(Long replyToId);
 
     List<Post> findAllByQuoteToId(Long quoteToId);
 
-    Optional<Post> findByIdAndRepostToIsNotNull(Long rePostId);
+    Optional<Post> findByIdAndRepostToIsNotNull(Long repostId);
 
     Optional<Post> findByIdAndReplyToIsNotNull(Long replyId);
 
-    Optional<Post> findByRepostToIdAndProfileId(Long rePostToId, String profileId);
+    Optional<Post> findByRepostToIdAndUserId(Long repostToId, String userId);
 
     Integer countAllByReplyToId(Long replyToId);
 
-    Integer countAllByRepostToId(Long rePostToId);
+    Integer countAllByRepostToId(Long repostToId);
 }

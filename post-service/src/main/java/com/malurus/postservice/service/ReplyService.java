@@ -1,10 +1,8 @@
 package com.malurus.postservice.service;
 
-import com.malurus.postservice.client.ProfileServiceClient;
 import com.malurus.postservice.dto.request.PostCreateRequest;
 import com.malurus.postservice.dto.request.PostUpdateRequest;
 import com.malurus.postservice.dto.response.PostResponse;
-import com.malurus.postservice.dto.response.ProfileResponse;
 import com.malurus.postservice.mapper.PostMapper;
 import com.malurus.postservice.repository.PostRepository;
 import com.malurus.postservice.util.PostUtil;
@@ -16,7 +14,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +33,6 @@ public class ReplyService {
     private final PostRepository postRepository;
     private final PostUtil postUtil;
     private final PostMapper postMapper;
-    private final ProfileServiceClient profileServiceClient;
     private final MessageSourceService messageSourceService;
     private final ViewService viewService;
     private final PostService postService;
@@ -44,12 +40,12 @@ public class ReplyService {
 
     public PostResponse reply(PostCreateRequest request, Long replyToId, String loggedInUser) {
         return postRepository.findById(replyToId)
-                .map(replyTo -> postMapper.toEntity(request, null, replyTo, profileServiceClient, loggedInUser))
+                .map(replyTo -> postMapper.toEntity(request, null, replyTo, loggedInUser))
                 .map(postRepository::saveAndFlush)
                 .map(reply -> {
                     postUtil.evictEntityFromCache(reply.getReplyTo().getId(), REPLIES_FOR_POST_CACHE_NAME);
                     postUtil.sendMessageWithReply(reply, ADD);
-                    return postMapper.toResponse(reply, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(reply, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", replyToId)
@@ -74,7 +70,7 @@ public class ReplyService {
     }
 
     @CachePut(cacheNames = REPLIES_CACHE_NAME, key = "#p0")
-    public PostResponse updateReply(Long replyId, PostUpdateRequest request, String loggedInUser, MultipartFile[] files) {
+    public PostResponse updateReply(Long replyId, PostUpdateRequest request, String loggedInUser) {
         return postRepository.findById(replyId)
                 .filter(reply -> postUtil.isEntityOwnedByLoggedInUser(reply, loggedInUser))
                 .map(reply -> postMapper.updatePost(request, reply))
@@ -82,7 +78,7 @@ public class ReplyService {
                 .map(reply -> {
                     postUtil.evictEntityFromCache(reply.getReplyTo().getId(), REPLIES_FOR_POST_CACHE_NAME);
                     postUtil.evictAllEntityRelationsFromCache(reply, CACHE_ONLY);
-                    return postMapper.toResponse(reply, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(reply, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", replyId)
@@ -94,12 +90,12 @@ public class ReplyService {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(REPLIES_CACHE_NAME));
         PostResponse replyResponse = cache.get(replyId, PostResponse.class);
         if (replyResponse != null) {
-            return updateReplyResponse(postUtil.updateProfileInResponse(replyResponse));
+            return updateReplyResponse(replyResponse);
         }
         return postRepository.findByIdAndReplyToIsNotNull(replyId)
-                .map(reply -> viewService.createViewEntity(reply, loggedInUser, profileServiceClient))
+                .map(reply -> viewService.createViewEntity(reply, loggedInUser))
                 .map(reply -> {
-                    PostResponse response = postMapper.toResponse(reply, loggedInUser, postUtil, profileServiceClient);
+                    PostResponse response = postMapper.toResponse(reply, loggedInUser, postUtil);
                     cache.put(replyId, response);
                     return response;
                 })
@@ -108,11 +104,10 @@ public class ReplyService {
                 ));
     }
 
-    public List<PostResponse> getAllRepliesForUser(String profileId, PageRequest page) {
-        ProfileResponse profile = profileServiceClient.getProfileById(profileId);
-        return postRepository.findAllByProfileIdAndReplyToIsNotNullOrderByCreationDateDesc(profileId, page)
+    public List<PostResponse> getAllRepliesForUser(String userId, PageRequest page) {
+        return postRepository.findAllByUserIdAndReplyToIsNotNullOrderByCreationDateDesc(userId, page)
                 .stream()
-                .map(reply -> postMapper.toResponse(reply, profile.getEmail(), postUtil, profileServiceClient))
+                .map(reply -> postMapper.toResponse(reply, userId, postUtil))
                 .collect(Collectors.toList());
     }
 
@@ -122,14 +117,13 @@ public class ReplyService {
         List<PostResponse> replyResponses = cache.get(replyToId, List.class);
         if (replyResponses != null) {
             return replyResponses.stream()
-                    .map(postUtil::updateProfileInResponse)
                     .map(this::updateReplyResponse)
                     .collect(Collectors.toList());
         }
 
         replyResponses = postRepository.findAllByReplyToIdOrderByCreationDateDesc(replyToId)
                 .stream()
-                .map(reply -> postMapper.toResponse(reply, loggedInUser, postUtil, profileServiceClient))
+                .map(reply -> postMapper.toResponse(reply, loggedInUser, postUtil))
                 .collect(Collectors.toList());
         cache.put(replyToId, replyResponses);
         return replyResponses;
@@ -138,7 +132,7 @@ public class ReplyService {
     private PostResponse updateReplyResponse(PostResponse replyResponse) {
         replyResponse.setReplyTo(postService.getPostById(
                 replyResponse.getReplyTo().getId(),
-                replyResponse.getProfile().getEmail()
+                replyResponse.getUserId()
         ));
         return replyResponse;
     }

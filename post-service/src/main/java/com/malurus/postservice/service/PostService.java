@@ -1,10 +1,8 @@
 package com.malurus.postservice.service;
 
-import com.malurus.postservice.client.ProfileServiceClient;
 import com.malurus.postservice.dto.request.PostCreateRequest;
 import com.malurus.postservice.dto.request.PostUpdateRequest;
 import com.malurus.postservice.dto.response.PostResponse;
-import com.malurus.postservice.dto.response.ProfileResponse;
 import com.malurus.postservice.exception.CreateEntityException;
 import com.malurus.postservice.mapper.PostMapper;
 import com.malurus.postservice.repository.PostRepository;
@@ -34,7 +32,6 @@ public class PostService {
 
     private final PostMapper postMapper;
     private final MessageSourceService messageSourceService;
-    private final ProfileServiceClient profileServiceClient;
     private final PostRepository postRepository;
     private final PostUtil postUtil;
     private final ViewService viewService;
@@ -42,11 +39,11 @@ public class PostService {
 
     public PostResponse createPost(PostCreateRequest request, String loggedInUser) {
         return Optional.of(request)
-                .map(req -> postMapper.toEntity(req, null, null, profileServiceClient, loggedInUser))
+                .map(req -> postMapper.toEntity(req, null, null, loggedInUser))
                 .map(postRepository::saveAndFlush)
                 .map(post -> {
                     postUtil.sendMessageWithPost(post, ADD);
-                    return postMapper.toResponse(post, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(post, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new CreateEntityException(
                         messageSourceService.generateMessage("error.entity.unsuccessful_creation")
@@ -55,11 +52,11 @@ public class PostService {
 
     public PostResponse createQuotePost(PostCreateRequest request, Long postId, String loggedInUser) {
         return postRepository.findById(postId)
-                .map(quoteToPost -> postMapper.toEntity(request, quoteToPost, null, profileServiceClient, loggedInUser))
+                .map(quoteToPost -> postMapper.toEntity(request, quoteToPost, null, loggedInUser))
                 .map(postRepository::saveAndFlush)
                 .map(post -> {
                     postUtil.sendMessageWithPost(post, ADD);
-                    return postMapper.toResponse(post, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(post, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", postId)
@@ -70,12 +67,12 @@ public class PostService {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(POSTS_CACHE_NAME));
         PostResponse postResponse = cache.get(postId, PostResponse.class);
         if (postResponse != null) {
-            return updatePostResponse(postUtil.updateProfileInResponse(postResponse));
+            return updatePostResponse(postResponse);
         }
         return postRepository.findById(postId)
-                .map(post -> viewService.createViewEntity(post, loggedInUser, profileServiceClient))
+                .map(post -> viewService.createViewEntity(post, loggedInUser))
                 .map(post -> {
-                    PostResponse response = postMapper.toResponse(post, loggedInUser, postUtil, profileServiceClient);
+                    PostResponse response = postMapper.toResponse(post, loggedInUser, postUtil);
                     cache.put(postId, response);
                     return response;
                 })
@@ -84,11 +81,10 @@ public class PostService {
                 ));
     }
 
-    public List<PostResponse> getAllPostsForUser(String profileId, PageRequest page) {
-        ProfileResponse profile = profileServiceClient.getProfileById(profileId);
-        return postRepository.findAllByProfileIdAndReplyToIsNullAndRepostToIsNullOrderByCreationDateDesc(profileId, page)
+    public List<PostResponse> getAllPostsForUser(String userId, PageRequest page) {
+        return postRepository.findAllByUserIdAndReplyToIsNullAndRepostToIsNullOrderByCreationDateDesc(userId, page)
                 .stream()
-                .map(post -> postMapper.toResponse(post, profile.getEmail(), postUtil, profileServiceClient))
+                .map(post -> postMapper.toResponse(post, userId, postUtil))
                 .toList();
     }
 
@@ -100,7 +96,7 @@ public class PostService {
                 .map(postRepository::saveAndFlush)
                 .map(post -> {
                     postUtil.evictAllEntityRelationsFromCache(post, CACHE_ONLY);
-                    return postMapper.toResponse(post, loggedInUser, postUtil, profileServiceClient);
+                    return postMapper.toResponse(post, loggedInUser, postUtil);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", postId)
@@ -125,7 +121,7 @@ public class PostService {
         if (quoteTo != null) {
             postResponse.setQuoteTo(getPostById(
                     quoteTo.getId(),
-                    postResponse.getProfile().getEmail()
+                    postResponse.getUserId()
             ));
         }
         return postResponse;

@@ -7,14 +7,14 @@ import lombok.Builder;
 @Builder
 public record EntityMessage (
         Long entityId,
-        String profileId,
+        String userId,
         String entityName,
         String operation
 ) {
-    public static EntityMessage valueOf(Long entityId, String profileId, EntityName entityName, Operation operation) {
+    public static EntityMessage valueOf(Long entityId, String userId, EntityName entityName, Operation operation) {
         return EntityMessage.builder()
                 .entityId(entityId)
-                .profileId(profileId)
+                .userId(userId)
                 .entityName(entityName.getName())
                 .operation(operation.getOperation())
                 .build();

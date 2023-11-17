@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
 
-    Optional<Like> findByParentPostIdAndProfileId(Long parentPostId, String profileId);
+    Optional<Like> findByParentPostIdAndUserId(Long parentPostId, String userId);
 
     Integer countAllByParentPostId(Long parentPostId);
 }

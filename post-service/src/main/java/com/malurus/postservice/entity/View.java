@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
-        name = "views",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"parent_post_id", "profileId"}),
+        name = "view",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"parent_post_id", "userId"}),
         indexes = {
                 @Index(columnList = "parent_post_id")
         }
@@ -23,7 +23,7 @@ public class View implements BaseEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String profileId;
+    private String userId;
 
     @ManyToOne(targetEntity = Post.class)
     private Post parentPost;
