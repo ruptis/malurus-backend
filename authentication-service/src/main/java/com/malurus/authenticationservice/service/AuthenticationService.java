@@ -52,7 +52,7 @@ public class AuthenticationService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.email(),
+                            accountService.findAccountByEmail(request.email()).getId(),
                             request.password()
                     )
             );

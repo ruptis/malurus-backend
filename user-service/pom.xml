@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>user-service</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.5</version>
     <name>user-service</name>
     <description>user-service</description>
     <properties>
@@ -39,6 +39,18 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+        </dependency>
+
+        <!--KAFKA-->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!--GSON-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
         <!--DISTRIBUTED TRACING-->

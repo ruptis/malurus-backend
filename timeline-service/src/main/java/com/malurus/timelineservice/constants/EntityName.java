@@ -8,8 +8,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public enum EntityName {
-    TWEETS("tweets"),
-    RETWEETS("retweets"),
+    POSTS("posts"),
+    REPOSTS("reposts"),
     REPLIES("replies");
     private final String name;
 }

@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 @Builder
@@ -20,19 +19,18 @@ public class PostResponse {
 
     private Long id;
     private PostResponse replyTo;
-    private PostResponse retweetTo;
-    private UserResponse profile;
-    private String text;
-    private Set<String> mediaUrls;
+    private PostResponse repostTo;
     private PostResponse quoteTo;
-    private Integer retweets;
+    private String userId;
+    private String text;
+    private Integer reposts;
     private Integer replies;
     private Integer likes;
     private Integer views;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
-    private Boolean isRetweeted;
+    private Boolean isReposted;
     private Boolean isLiked;
     private Boolean isBelongs;
 }

@@ -1,5 +1,6 @@
 package com.malurus.socialgraphservice.controller;
 
+import com.malurus.socialgraphservice.dto.response.UserResponse;
 import com.malurus.socialgraphservice.service.SocialGraphService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,31 +16,36 @@ public class SocialGraphController {
 
     @GetMapping("/{followeeId}")
     public ResponseEntity<Boolean> isFollowed(@PathVariable String followeeId, @RequestHeader String loggedInUser) {
-        return ResponseEntity.ok(socialGraphService.isFollowed(followeeId, loggedInUser));
+        return ResponseEntity.ok(socialGraphService.isFollowed(loggedInUser, followeeId));
+    }
+
+    @GetMapping("/{userId}/celebrity")
+    public ResponseEntity<Boolean> isCelebrity(@PathVariable String userId) {
+        return ResponseEntity.ok(socialGraphService.isCelebrity(userId));
     }
 
     @PostMapping("/{followeeId}")
     public ResponseEntity<Boolean> follow(@PathVariable String followeeId, @RequestHeader String loggedInUser) {
-        return ResponseEntity.ok(socialGraphService.follow(followeeId, loggedInUser));
+        return ResponseEntity.ok(socialGraphService.follow(loggedInUser, followeeId));
     }
 
     @DeleteMapping("/{followeeId}")
     public ResponseEntity<Boolean> unfollow(@PathVariable String followeeId, @RequestHeader String loggedInUser) {
-        return ResponseEntity.ok(socialGraphService.unfollow(followeeId, loggedInUser));
+        return ResponseEntity.ok(socialGraphService.unfollow(loggedInUser, followeeId));
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<String>> getFollowers(@PathVariable String userId) {
+    public ResponseEntity<List<UserResponse>> getFollowers(@PathVariable String userId) {
         return ResponseEntity.ok(socialGraphService.getFollowers(userId));
     }
 
     @GetMapping("/{userId}/followees")
-    public ResponseEntity<List<String>> getFollowees(@PathVariable String userId) {
+    public ResponseEntity<List<UserResponse>> getFollowees(@PathVariable String userId) {
         return ResponseEntity.ok(socialGraphService.getFollowees(userId));
     }
 
     @GetMapping("/{userId}/followees-celebrities")
-    public ResponseEntity<List<String>> getFolloweesCelebrities(@PathVariable String userId) {
+    public ResponseEntity<List<UserResponse>> getFolloweesCelebrities(@PathVariable String userId) {
         return ResponseEntity.ok(socialGraphService.getFolloweesCelebrities(userId));
     }
 }

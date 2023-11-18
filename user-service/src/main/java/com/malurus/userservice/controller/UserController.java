@@ -49,7 +49,7 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequest request,
             @RequestHeader String loggedInUser
     ) {
-        return ResponseEntity.ok(userService.updateUser(request, loggedInUser));
+        return ResponseEntity.ok(userService.updateUser(loggedInUser, request));
     }
 
     @GetMapping("/id/{email}")

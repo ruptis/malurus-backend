@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "relationship", indexes = {
-        @Index(name = "follower_idx", columnList = "followerId"),
-        @Index(name = "followee_idx", columnList = "followeeId")
+        @Index(name = "followee_idx", columnList = "followee"),
+        @Index(name = "follower_followee_idx", columnList = "follower, followee", unique = true)
 })
 public class Relationship {
 
@@ -23,9 +24,15 @@ public class Relationship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String followerId;
+    @ManyToOne
+    @JoinColumn(name = "follower", nullable = false)
+    private User follower;
 
-    private String followeeId;
+    @ManyToOne
+    @JoinColumn(name = "followee", nullable = false)
+    private User followee;
 
+    @CreationTimestamp
     private LocalDateTime followDateTime;
 }
+

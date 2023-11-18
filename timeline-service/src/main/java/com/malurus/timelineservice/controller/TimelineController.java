@@ -22,16 +22,16 @@ public class TimelineController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(timelineService.getUserTimelineForLoggedInUser(loggedInUser, PageRequest.of(page, size)));
+        return ResponseEntity.ok(timelineService.getUserTimeline(loggedInUser, PageRequest.of(page, size)));
     }
 
-    @GetMapping("/user/{profileId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<PostResponse>> getUserTimelineForAnotherUser(
-            @PathVariable String profileId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(timelineService.getUserTimelineForAnotherInUser(profileId, PageRequest.of(page, size)));
+        return ResponseEntity.ok(timelineService.getUserTimeline(userId, PageRequest.of(page, size)));
     }
 
     @GetMapping("/user-replies")
@@ -40,16 +40,16 @@ public class TimelineController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(timelineService.getRepliesUserTimelineForLoggedInUser(loggedInUser, PageRequest.of(page, size)));
+        return ResponseEntity.ok(timelineService.getRepliesUserTimeline(loggedInUser, PageRequest.of(page, size)));
     }
 
-    @GetMapping("/user-replies/{profileId}")
+    @GetMapping("/user-replies/{userId}")
     public ResponseEntity<List<PostResponse>> getRepliesUserTimelineForAnotherUser(
-            @PathVariable String profileId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(timelineService.getRepliesUserTimelineForAnotherInUser(profileId, PageRequest.of(page, size)));
+        return ResponseEntity.ok(timelineService.getRepliesUserTimeline(userId, PageRequest.of(page, size)));
     }
 
     @GetMapping("/home")
@@ -58,6 +58,6 @@ public class TimelineController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(timelineService.getHomeTimelineForLoggedInUser(loggedInUser, PageRequest.of(page, size)));
+        return ResponseEntity.ok(timelineService.getHomeTimeline(loggedInUser, PageRequest.of(page, size)));
     }
 }

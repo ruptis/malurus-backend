@@ -55,7 +55,7 @@ public class PostUtil {
     }
 
     public boolean isEntityOwnedByLoggedInUser(Post entity, String loggedInUser) {
-        if (!loggedInUser.equals(entity.getUserId())) {
+        if (!isPostBelongsToUser(entity, loggedInUser)) {
             throw new ActionNotAllowedException(
                     messageSourceService.generateMessage("error.action_not_allowed")
             );
@@ -63,12 +63,16 @@ public class PostUtil {
         return true;
     }
 
-    public boolean isPostRepostedByLoggedInUser(Long repostToId, String loggedInUser) {
-        return postRepository.findByRepostToIdAndUserId(repostToId, loggedInUser).isPresent();
+    public boolean isPostBelongsToUser(Post entity, String userId) {
+        return userId.equals(entity.getUserId());
     }
 
-    public boolean isPostLikedByLoggedInUser(Long parentPostId, String loggedInUser) {
-        return likeRepository.findByParentPostIdAndUserId(parentPostId, loggedInUser).isPresent();
+    public boolean isPostRepostedByUser(Long repostToId, String userId) {
+        return postRepository.findByRepostToIdAndUserId(repostToId, userId).isPresent();
+    }
+
+    public boolean isPostLikedByUser(Long parentPostId, String userId) {
+        return likeRepository.findByParentPostIdAndUserId(parentPostId, userId).isPresent();
     }
 
     public void sendMessageToKafka(String topic, Post entity, EntityName entityName, Operation operation) {

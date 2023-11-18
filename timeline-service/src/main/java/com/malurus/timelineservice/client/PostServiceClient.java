@@ -9,35 +9,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient("${services.tweet.name}")
+@FeignClient("${services.post.name}")
 public interface PostServiceClient {
 
-    @GetMapping("/api/v1/tweets/user/{profileId}")
-    List<PostResponse> getAllTweetsForUser(
-            @PathVariable String profileId,
+    @GetMapping("/api/v1/posts/user/{userId}")
+    List<PostResponse> getAllPostsForUser(
+            @PathVariable String userId,
             @RequestParam int page,
             @RequestParam int size
     );
 
-    @GetMapping("/api/v1/retweets/user/{profileId}")
-    List<PostResponse> getAllRetweetsForUser(
-            @PathVariable String profileId,
+    @GetMapping("/api/v1/reposts/user/{userId}")
+    List<PostResponse> getAllRepostsForUser(
+            @PathVariable String userId,
             @RequestParam int page,
             @RequestParam int size
     );
 
-    @GetMapping("/api/v1/replies/user/{profileId}")
+    @GetMapping("/api/v1/replies/user/{userId}")
     List<PostResponse> getAllRepliesForUser(
-            @PathVariable String profileId,
+            @PathVariable String userId,
             @RequestParam int page,
             @RequestParam int size
     );
 
-    @GetMapping("/api/v1/tweet/{tweetId}")
-    PostResponse getTweet(@PathVariable Long tweetId, @RequestHeader String loggedInUser);
+    @GetMapping("/api/v1/post/{postId}")
+    PostResponse getPost(@PathVariable Long postId, @RequestHeader String loggedInUser);
 
-    @GetMapping("/api/v1/retweet/{retweetId}")
-    PostResponse getRetweet(@PathVariable Long retweetId, @RequestHeader String loggedInUser);
+    @GetMapping("/api/v1/repost/{repostId}")
+    PostResponse getRepost(@PathVariable Long repostId, @RequestHeader String loggedInUser);
 
     @GetMapping("/api/v1/reply/{replyId}")
     PostResponse getReply(@PathVariable Long replyId, @RequestHeader String loggedInUser);

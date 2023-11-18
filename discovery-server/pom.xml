@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>discovery-server</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>jar</packaging>
 
     <name>discovery-server</name>

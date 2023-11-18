@@ -4,7 +4,6 @@ import com.malurus.userservice.dto.request.CreateUserRequest;
 import com.malurus.userservice.dto.request.UpdateUserRequest;
 import com.malurus.userservice.dto.response.UserResponse;
 import com.malurus.userservice.entity.User;
-import com.malurus.userservice.exception.ActionNotAllowedException;
 import com.malurus.userservice.exception.EntityNotFoundException;
 import com.malurus.userservice.mapper.UserMapper;
 import com.malurus.userservice.repository.UserRepository;
@@ -18,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.malurus.userservice.constant.CacheName.USERS_CACHE;
+import static com.malurus.userservice.constant.TopicName.USER_CREATED;
+import static com.malurus.userservice.constant.TopicName.USER_UPDATED;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +26,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final KafkaProducerService kafkaProducerService;
     private final MessageSourceService messageSourceService;
 
     public String createUser(CreateUserRequest createUserRequest) {
         return Optional.of(createUserRequest)
                 .map(userMapper::toEntity)
                 .map(userRepository::save)
-                .map(User::getId)
+                .map(user -> {
+                    kafkaProducerService.send(user, USER_CREATED);
+                    return user.getId();
+                })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.unsuccessful_creation")
                 ));
@@ -47,11 +52,14 @@ public class UserService {
     }
 
     @CachePut(cacheNames = USERS_CACHE, key = "#p0")
-    public UserResponse updateUser(UpdateUserRequest updateUserRequest, String loggedInUser) {
+    public UserResponse updateUser(String loggedInUser, UpdateUserRequest updateUserRequest) {
         return userRepository.findById(loggedInUser)
                 .map(user -> userMapper.updateUserFromUpdateUserRequest(updateUserRequest, user))
                 .map(userRepository::save)
-                .map(userMapper::toResponse)
+                .map(user -> {
+                    kafkaProducerService.send(user, USER_UPDATED);
+                    return userMapper.toResponse(user);
+                })
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", loggedInUser)
                 ));

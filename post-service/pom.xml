@@ -10,7 +10,7 @@
 
     <artifactId>post-service</artifactId>
     <name>post-service</name>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>jar</packaging>
 
     <properties>

@@ -54,9 +54,9 @@ public interface PostMapper {
     @Mapping(target = "replies", expression = "java(postUtil.countRepliesForPost(post.getId()))")
     @Mapping(target = "views", expression = "java(postUtil.countViewsForPost(post.getId()))")
     @Mapping(target = "reposts", expression = "java(postUtil.countRepostsForPost(post.getId()))")
-    @Mapping(target = "isReposted", expression = "java(postUtil.isPostRepostedByLoggedInUser(post.getId(), loggedInUser))")
-    @Mapping(target = "isLiked", expression = "java(postUtil.isPostLikedByLoggedInUser(post.getId(), loggedInUser))")
-    @Mapping(target = "isBelongs", expression = "java(postUtil.isEntityOwnedByLoggedInUser(post, loggedInUser))")
+    @Mapping(target = "isReposted", expression = "java(postUtil.isPostRepostedByUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isLiked", expression = "java(postUtil.isPostLikedByUser(post.getId(), loggedInUser))")
+    @Mapping(target = "isBelongs", expression = "java(postUtil.isPostBelongsToUser(post, loggedInUser))")
     PostResponse toResponse(
             Post post,
             @Context String loggedInUser,

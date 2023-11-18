@@ -1,4 +1,4 @@
-package com.malurus.timelineservice.dto.response;
+package com.malurus.socialgraphservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

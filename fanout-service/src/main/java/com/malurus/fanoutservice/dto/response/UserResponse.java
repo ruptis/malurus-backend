@@ -1,4 +1,4 @@
-package com.malurus.timelineservice.dto.response;
+package com.malurus.fanoutservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

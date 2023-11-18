@@ -3,6 +3,7 @@ package com.malurus.fanoutservice.service;
 import com.malurus.fanoutservice.client.SocialGraphServiceClient;
 import com.malurus.fanoutservice.constants.Operation;
 import com.malurus.fanoutservice.dto.message.EntityMessage;
+import com.malurus.fanoutservice.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,22 +41,22 @@ public class FanoutService {
     }
 
     public void processMessageForHomeTimeline(EntityMessage entityMessage) {
+        if (Boolean.TRUE.equals(socialGraphServiceClient.isCelebrity(entityMessage.userId()))) return;
         final Long entityId = entityMessage.entityId();
-        List<String> followers = socialGraphServiceClient.getFollowers(entityMessage.userId());
+        List<String> followers = socialGraphServiceClient.getFollowers(entityMessage.userId()).stream().map(UserResponse::getId).toList();
         String prefix = TimelineCachePrefix.HOME_TIMELINE_PREFIX.getPrefix().formatted(entityMessage.entityName());
 
         final Operation operation = Operation.valueOf(entityMessage.operation());
-        if (followers.size() < 10000) {
-            for (String followerId : followers) {
-                final String timelineKey = prefix + followerId;
+        for (String followerId : followers) {
+            final String timelineKey = prefix + followerId;
 
-                if (operation == Operation.ADD) {
-                    addEntityToTimeline(entityId, timelineKey);
-                } else if (operation == Operation.DELETE) {
-                    deleteEntityFromTimeline(entityId, timelineKey);
-                }
+            if (operation == Operation.ADD) {
+                addEntityToTimeline(entityId, timelineKey);
+            } else if (operation == Operation.DELETE) {
+                deleteEntityFromTimeline(entityId, timelineKey);
             }
         }
+
     }
 
     private void addEntityToTimeline(Long entityId, String timelineKey) {
