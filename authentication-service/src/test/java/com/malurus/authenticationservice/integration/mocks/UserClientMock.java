@@ -1,4 +1,4 @@
-package com.malurus.authenticationservice.mocks;
+package com.malurus.authenticationservice.integration.mocks;
 
 import com.malurus.authenticationservice.client.UserServiceClient;
 import com.malurus.authenticationservice.client.request.CreateUserRequest;

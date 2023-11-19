@@ -1,20 +1,19 @@
 package com.malurus.authenticationservice.integration.controller;
 
 import com.malurus.authenticationservice.client.UserServiceClient;
-import com.malurus.authenticationservice.mocks.UserClientMock;
+import com.malurus.authenticationservice.integration.IntegrationTestBase;
+import com.malurus.authenticationservice.integration.mocks.UserClientMock;
 import com.malurus.authenticationservice.service.MessageSourceService;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.malurus.authenticationservice.integration.constants.AuthConstants.EXISTENT_ACCOUNT_EMAIL;
-import static com.malurus.authenticationservice.integration.constants.AuthConstants.NEW_ACCOUNT_EMAIL;
 import static com.malurus.authenticationservice.integration.constants.JsonConstants.EXISTENT_ACCOUNT_JSON;
 import static com.malurus.authenticationservice.integration.constants.JsonConstants.NEW_ACCOUNT_JSON;
 import static com.malurus.authenticationservice.integration.constants.UrlConstants.AUTHENTICATE_URL;
@@ -25,10 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
-class AuthenticationControllerTest {
+class AuthenticationControllerTest extends IntegrationTestBase {
 
     private final MockMvc mockMvc;
     private final MessageSourceService messageService;
@@ -44,7 +42,6 @@ class AuthenticationControllerTest {
     @Test
     void testRegisterSuccess() throws Exception {
         registerAccount(NEW_ACCOUNT_JSON.getConstant());
-        authenticateUnactivatedAccountAndExpectForbidden(NEW_ACCOUNT_JSON.getConstant(), NEW_ACCOUNT_EMAIL.getConstant());
         String token = authenticateAccountAndExpectToken(NEW_ACCOUNT_JSON.getConstant());
         assertNotNull(token);
     }
@@ -60,7 +57,7 @@ class AuthenticationControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.message").value(messageService.generateMessage("activation.send.success"))
+                        jsonPath("$.message").value(messageService.generateMessage("register.success"))
                 );
     }
 
@@ -84,16 +81,6 @@ class AuthenticationControllerTest {
                 );
 
         return extractTokenFromResponse(result);
-    }
-
-    private void authenticateUnactivatedAccountAndExpectForbidden(String account, String email) throws Exception {
-        mockMvc.perform(post(AUTHENTICATE_URL.getConstant())
-                        .content(account)
-                        .contentType(APPLICATION_JSON))
-                .andExpectAll(
-                        status().isForbidden(),
-                        jsonPath("$.message").value(messageService.generateMessage("error.account.not_activated", email))
-                );
     }
 
     private String extractTokenFromResponse(ResultActions resultActions) throws Exception {

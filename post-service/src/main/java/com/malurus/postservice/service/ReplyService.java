@@ -43,6 +43,7 @@ public class ReplyService {
                 .map(replyTo -> postMapper.toEntity(request, null, replyTo, loggedInUser))
                 .map(postRepository::saveAndFlush)
                 .map(reply -> {
+                    assert reply.getReplyTo() != null;
                     postUtil.evictEntityFromCache(reply.getReplyTo().getId(), REPLIES_FOR_POST_CACHE_NAME);
                     postUtil.sendMessageWithReply(reply, ADD);
                     return postMapper.toResponse(reply, loggedInUser, postUtil);
@@ -57,6 +58,7 @@ public class ReplyService {
         postRepository.findById(replyId)
                 .filter(reply -> postUtil.isEntityOwnedByLoggedInUser(reply, loggedInUser))
                 .ifPresentOrElse(reply -> {
+                    assert reply.getReplyTo() != null;
                     postUtil.evictEntityFromCache(reply.getReplyTo().getId(), REPLIES_FOR_POST_CACHE_NAME);
                     postUtil.evictAllEntityRelationsFromCache(reply, WITH_TIMELINE);
                     postUtil.sendMessageWithReply(reply, DELETE);
@@ -76,6 +78,7 @@ public class ReplyService {
                 .map(reply -> postMapper.updatePost(request, reply))
                 .map(postRepository::saveAndFlush)
                 .map(reply -> {
+                    assert reply.getReplyTo() != null;
                     postUtil.evictEntityFromCache(reply.getReplyTo().getId(), REPLIES_FOR_POST_CACHE_NAME);
                     postUtil.evictAllEntityRelationsFromCache(reply, CACHE_ONLY);
                     return postMapper.toResponse(reply, loggedInUser, postUtil);
