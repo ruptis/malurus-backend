@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient("${services.social-graph.name}")
+@FeignClient(name = "${services.social-graph.name}" , url = "${services.social-graph.url}")
 public interface SocialGraphServiceClient {
 
     @GetMapping("/api/v1/social-graph/{userId}/followers")

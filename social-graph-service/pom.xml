@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>social-graph-service</artifactId>
-    <version>0.5</version>
+    <version>0.5-k8s</version>
     <name>social-graph-service</name>
     <description>social-graph-service</description>
     <properties>
@@ -73,13 +73,6 @@
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
 
-        <!--NETFLIX STACK-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-
         <!--LOMBOK-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -99,6 +92,13 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
             <version>4.0.3</version>
+        </dependency>
+
+        <!--KUBERNETES-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-all</artifactId>
+            <version>1.1.10.RELEASE</version>
         </dependency>
 
         <!--VALIDATION-->

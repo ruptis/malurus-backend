@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: authentication-service-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: postgres-authentication-service-cm
+      labels:
+        app: postgres-authentication-service
+    data:
+      POSTGRES_DB: "authentication-service"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_AUTH_METHOD: "TRUST"
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: postgres-authentication-service
+      labels:
+        app: postgres-authentication-service
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: postgres-authentication-service
+      template:
+        metadata:
+          name: postgres-authentication-service
+          labels:
+            app: postgres-authentication-service
+        spec:
+          containers:
+            - name: postgres-authentication-service
+              image: postgres
+              ports:
+                - containerPort: 5432
+              envFrom:
+                - configMapRef:
+                    name: postgres-authentication-service-cm
+              volumeMounts:
+                - mountPath: /data/postgres
+                  name: data-authentication-service
+              imagePullPolicy: IfNotPresent
+          volumes:
+            - name: data-authentication-service
+              persistentVolumeClaim:
+                claimName: authentication-service-pvc
+          restartPolicy: Always
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: postgres-authentication-service
+    spec:
+      selector:
+        app: postgres-authentication-service
+      ports:
+        - port: 5432
+          targetPort: 5432

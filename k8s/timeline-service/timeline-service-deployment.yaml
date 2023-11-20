@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: timeline-service
+      labels:
+        app: timeline-service
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: timeline-service
+      template:
+        metadata:
+          name: timeline-service
+          labels:
+            app: timeline-service
+        spec:
+          containers:
+            - name: timeline-service
+              image: kazyshi/malurus-timeline-service:0.5-k8s
+              imagePullPolicy: Always
+          restartPolicy: Always
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: timeline-service
+      labels:
+        app: timeline-service
+    spec:
+      selector:
+        app: timeline-service
+      ports:
+        - port: 8085
+          protocol: TCP
+          targetPort: 8085

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient("${services.post.name}")
+@FeignClient(name = "${services.post.name}" , url = "${services.post.url}")
 public interface PostServiceClient {
 
     @GetMapping("/api/v1/posts/user/{userId}")

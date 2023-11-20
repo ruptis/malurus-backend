@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: fanout-service
+      labels:
+        app: fanout-service
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: fanout-service
+      template:
+        metadata:
+          name: fanout-service
+          labels:
+            app: fanout-service
+        spec:
+          containers:
+            - name: fanout-service
+              image: kazyshi/malurus-fanout-service:0.5-k8s
+              imagePullPolicy: Always
+          restartPolicy: Always
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: fanout-service
+      labels:
+        app: fanout-service
+    spec:
+      selector:
+        app: fanout-service
+      ports:
+        - port: 8086
+          protocol: TCP
+          targetPort: 8086

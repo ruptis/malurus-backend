@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>spring-cloud-config-server</artifactId>
-    <version>0.5</version>
+    <version>0.5-k8s</version>
     <name>spring-cloud-config-server</name>
     <description>spring-cloud-config-server</description>
     <properties>

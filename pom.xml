@@ -21,7 +21,6 @@
     <modules>
         <module>api-gateway</module>
         <module>spring-cloud-config-server</module>
-        <module>discovery-server</module>
         <module>authentication-service</module>
         <module>user-service</module>
         <module>social-graph-service</module>
@@ -44,7 +43,6 @@
         <swagger.version>2.0.4</swagger.version>
         <redis-container.version>1.4.6</redis-container.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <spring-cloud-starter-aws.version>2.2.6.RELEASE</spring-cloud-starter-aws.version>
         <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
         <gson.version>2.10.1</gson.version>
         <jwt.version>0.11.5</jwt.version>

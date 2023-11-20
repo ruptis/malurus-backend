@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "${services.user.name}")
+@FeignClient(name = "${services.user.name}", url = "${services.user.url}")
 public interface UserServiceClient {
 
     @PostMapping(value = "/api/v1/users")

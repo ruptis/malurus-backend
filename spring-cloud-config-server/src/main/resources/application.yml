@@ -8,5 +8,5 @@ spring:
         git:
           uri: https://github.com/ruptis/malurus-config-server
           searchPaths: '{application}'
-          default-label: master
+          default-label: k8s-deploy
           timeout: 3

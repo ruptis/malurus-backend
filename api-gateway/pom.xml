@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>api-gateway</artifactId>
-    <version>0.5</version>
+    <version>0.5-k8s</version>
     <packaging>jar</packaging>
 
     <name>api-gateway</name>
@@ -24,6 +24,13 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
             <version>4.0.6</version>
+        </dependency>
+
+        <!--KUBERNETES-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-all</artifactId>
+            <version>1.1.10.RELEASE</version>
         </dependency>
 
         <!--WEBFLUX-->
@@ -53,13 +60,6 @@
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
 
-        <!--NETFLIX STACK-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-
         <!--SECURITY-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -71,6 +71,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
             <version>4.0.3</version>
+        </dependency>
+
+        <!--GSON-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
         <!--LOMBOK-->

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: post-service-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: postgres-post-service-cm
+      labels:
+        app: postgres-post-service
+    data:
+      POSTGRES_DB: "post-service"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_AUTH_METHOD: "TRUST"
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: postgres-post-service
+      labels:
+        app: postgres-post-service
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: postgres-post-service
+      template:
+        metadata:
+          name: postgres-post-service
+          labels:
+            app: postgres-post-service
+        spec:
+          containers:
+            - name: postgres-post-service
+              image: postgres
+              ports:
+                - containerPort: 5432
+              envFrom:
+                - configMapRef:
+                    name: postgres-post-service-cm
+              volumeMounts:
+                - mountPath: /data/postgres
+                  name: data-post-service
+              imagePullPolicy: IfNotPresent
+          volumes:
+            - name: data-post-service
+              persistentVolumeClaim:
+                claimName: post-service-pvc
+          restartPolicy: Always
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: postgres-post-service
+    spec:
+      selector:
+        app: postgres-post-service
+      ports:
+        - port: 5431
+          targetPort: 5432

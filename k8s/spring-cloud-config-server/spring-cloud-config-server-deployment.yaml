@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: spring-cloud-config-server
+      labels:
+        app: spring-cloud-config-server
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: spring-cloud-config-server
+      template:
+        metadata:
+          name: spring-cloud-config-server
+          labels:
+            app: spring-cloud-config-server
+        spec:
+          containers:
+            - name: spring-cloud-config-server
+              image: kazyshi/malurus-spring-cloud-config-server:0.5-k8s
+              imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: spring-cloud-config-server
+      labels:
+        app: spring-cloud-config-server
+    spec:
+      selector:
+        app: spring-cloud-config-server
+      ports:
+        - port: 8888
+          protocol: TCP
+          targetPort: 8888
+      type: NodePort

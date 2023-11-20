@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis
+  replicas: 6   # 6 replicas, 3 master and 3 replicas(slaves)
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      initContainers:
+        - name: config
+          image: redis:7.0.0-alpine
+          command: [ "sh", "-c" ]
+          args:
+            - |
+              if [ -f "/conf/redis.conf" ]; then
+                echo "config exists /conf/redis.conf .. not creating new"
+              else
+                echo "config doesn't exist copying to /conf/redis.conf"
+                cp /tmp/conf/redis.conf /conf/redis.conf
+              fi
+          volumeMounts:
+            - name: storage
+              subPath: conf
+              mountPath: /conf
+            - name: config
+              mountPath: /tmp/conf/
+      containers:
+        - name: redis
+          image: redis:7.0.0-alpine
+          command: ["redis-server"]
+          args: ["/conf/redis.conf"]
+          resources:
+            requests:
+              memory: "100M"
+            limits:
+              memory: "2000M"
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: storage
+              mountPath: /data
+              subPath: data
+            - name: storage
+              mountPath: /conf
+              subPath: conf
+      volumes:
+        - name: config
+          configMap:
+            name: redis-config
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 50Mi
