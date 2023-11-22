@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import java.util.Optional;
 
@@ -33,6 +35,8 @@ class LikeServiceTest {
 
     @Mock
     private MessageSourceService messageSourceService;
+    @Mock
+    private CacheManager cacheManager;
 
     @InjectMocks
     private LikeService likeService;
@@ -48,6 +52,7 @@ class LikeServiceTest {
         Like likeEntity = new Like();
         when(likeMapper.toEntity(post, loggedInUser)).thenReturn(likeEntity);
         when(likeRepository.saveAndFlush(likeEntity)).thenReturn(likeEntity);
+        when(cacheManager.getCache(anyString())).thenReturn(mock(Cache.class));
 
         // Call likePost
         likeService.likePost(postId, loggedInUser);
@@ -82,6 +87,7 @@ class LikeServiceTest {
 
         // Mocking
         when(likeRepository.findByParentPostIdAndUserId(postId, loggedInUser)).thenReturn(Optional.of(mock(Like.class)));
+        when(cacheManager.getCache(anyString())).thenReturn(mock(Cache.class));
 
         // Call unlikePost
         likeService.unlikePost(postId, loggedInUser);

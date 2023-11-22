@@ -40,7 +40,7 @@ spec:
             requests:
               memory: "100M"
             limits:
-              memory: "2000M"
+              memory: "1000M"
           ports:
             - containerPort: 6379
               name: redis

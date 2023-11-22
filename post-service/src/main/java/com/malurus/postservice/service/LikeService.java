@@ -5,7 +5,12 @@ import com.malurus.postservice.repository.LikeRepository;
 import com.malurus.postservice.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+
+import static com.malurus.postservice.constant.CacheName.POSTS_CACHE_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +20,7 @@ public class LikeService {
     private final PostRepository postRepository;
     private final LikeMapper likeMapper;
     private final MessageSourceService messageSourceService;
+    private final CacheManager cacheManager;
 
     public void likePost(Long postId, String loggedInUser) {
         postRepository.findById(postId)
@@ -23,6 +29,7 @@ public class LikeService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         messageSourceService.generateMessage("error.entity.not_found", postId)
                 ));
+        Objects.requireNonNull(cacheManager.getCache(POSTS_CACHE_NAME)).evictIfPresent(postId);
     }
 
     public void unlikePost(Long postId, String loggedInUser) {
@@ -32,5 +39,6 @@ public class LikeService {
                             messageSourceService.generateMessage("error.entity.not_found", postId)
                     );
                 });
+        Objects.requireNonNull(cacheManager.getCache(POSTS_CACHE_NAME)).evictIfPresent(postId);
     }
 }
